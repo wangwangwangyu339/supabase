@@ -40,11 +40,13 @@ jobs:
             NEXT_PUBLIC_API_URL=http://47.98.247.190:3000/platform
             NEXT_PUBLIC_ENVIRONMENT=production
           tags: supabase/studio:2026.09.27-dev-platform
+          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Save & compress image to zip
         run: |
+          docker image inspect supabase/studio:2026.09.27-dev-platform >/dev/null 2>&1 || { echo "镜像不存在，终止"; exit 1; }
           docker save supabase/studio:2026.09.27-dev-platform | gzip > studio-image.tar.gz
           ls -lh studio-image.tar.gz
 
