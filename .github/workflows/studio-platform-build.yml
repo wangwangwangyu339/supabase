@@ -37,9 +37,9 @@ jobs:
           build-args: |
             STUDIO_FRAMEWORK=next
             NEXT_PUBLIC_IS_PLATFORM=true
-            NEXT_PUBLIC_API_URL=http://47.98.247.190:3000/platform
+            NEXT_PUBLIC_API_URL=http://47.98.247.190/platform
             NEXT_PUBLIC_ENVIRONMENT=production
-            NEXT_PUBLIC_GOTRUE_URL=http://47.98.247.190:3000/auth/v1
+            NEXT_PUBLIC_GOTRUE_URL=http://47.98.247.190/auth/v1
           tags: supabase/studio:2026.09.27-dev-platform
           load: true
           cache-from: type=gha
