@@ -25,14 +25,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Studio (platform mode, custom tag)
-        run: |
-          docker build . -f apps/studio/Dockerfile --target production \
-            --build-arg STUDIO_FRAMEWORK=next \
-            --build-arg NEXT_PUBLIC_IS_PLATFORM=true \
-            --build-arg NEXT_PUBLIC_API_URL=http://47.98.247.190:3000/platform \
-            --build-arg NEXT_PUBLIC_ENVIRONMENT=production \
-            -t supabase/studio:2026.09.27-dev-platform
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Studio (platform mode, GHA layer cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/studio/Dockerfile
+          target: production
+          build-args: |
+            STUDIO_FRAMEWORK=next
+            NEXT_PUBLIC_IS_PLATFORM=true
+            NEXT_PUBLIC_API_URL=http://47.98.247.190:3000/platform
+            NEXT_PUBLIC_ENVIRONMENT=production
+          tags: supabase/studio:2026.09.27-dev-platform
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Save & compress image to zip
         run: |
