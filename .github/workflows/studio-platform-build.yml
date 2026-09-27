@@ -39,12 +39,24 @@ jobs:
           docker save supabase/studio:2026.09.27-dev-platform | gzip > studio-image.tar.gz
           ls -lh studio-image.tar.gz
 
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: studio-image
-          path: studio-image.tar.gz
-          retention-days: 7
+      - name: Transfer image to control plane (hermes-hz)
+        env:
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$ECS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          scp -o StrictHostKeyChecking=no -o ConnectTimeout=20 studio-image.tar.gz root@47.98.247.190:/opt/studio-images/
+
+      - name: Load image on hermes-hz
+        env:
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$ECS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 root@47.98.247.190 \
+            "docker load -i /opt/studio-images/studio-image.tar.gz && docker images | grep '2026.09.27-dev-platform'"
 
       - name: Login to Docker Hub
         if: env.DOCKER_USERNAME != ''
