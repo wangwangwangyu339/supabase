@@ -17,6 +17,14 @@
 # trees), not at container start.
 ARG STUDIO_FRAMEWORK=next
 
+# Platform-mode build args (injected at build time because NEXT_PUBLIC_*
+# vars are compile-time constants in Next.js; runtime env vars do NOT apply).
+# Build with: --build-arg NEXT_PUBLIC_IS_PLATFORM=true \
+#             --build-arg NEXT_PUBLIC_API_URL=http://<control-plane>/platform
+ARG NEXT_PUBLIC_IS_PLATFORM=false
+ARG NEXT_PUBLIC_API_URL=
+ARG NEXT_PUBLIC_ENVIRONMENT=production
+
 FROM node:22-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -60,6 +68,9 @@ CMD ["pnpm", "dev:studio"]
 
 # Compile Next.js
 FROM dev AS build-next
+ENV NEXT_PUBLIC_IS_PLATFORM=$NEXT_PUBLIC_IS_PLATFORM
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_ENVIRONMENT=$NEXT_PUBLIC_ENVIRONMENT
 RUN pnpm --filter studio exec next build
 
 # Assemble the runtime tree at /srv in the layout the production stage
