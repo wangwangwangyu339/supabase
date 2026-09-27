@@ -67,7 +67,12 @@ EXPOSE 8082
 CMD ["pnpm", "dev:studio"]
 
 # Compile Next.js
+# NOTE: Docker ARG scope — top-level ARG (before FROM) is NOT visible inside
+# build stages; each stage must redeclare ARG to consume build-args.
 FROM dev AS build-next
+ARG NEXT_PUBLIC_IS_PLATFORM
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_ENVIRONMENT
 ENV NEXT_PUBLIC_IS_PLATFORM=$NEXT_PUBLIC_IS_PLATFORM
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_ENVIRONMENT=$NEXT_PUBLIC_ENVIRONMENT
